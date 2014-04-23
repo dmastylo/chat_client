@@ -3,10 +3,16 @@ var addMessage = function(s)
   $('#output').append("<div class='message'>" + s + "</div>");
 }
 
+var addUser = function(s)
+{
+  $('#who-here-output').append("<div class='message'>" + s + "</div>");
+}
+
 $(document).ready(function()
 {
   $messageTextBox = $('#inputMessage');
-  var commands = ["BROADCAST", "ME IS"];
+  $refreshButton = $('#refreshButton');
+  var commands = ["BROADCAST", "ME IS", "WHO HERE"];
   var command = "";
   var messageSent = "";
   var username = "";
@@ -55,19 +61,24 @@ $(document).ready(function()
       username = messageSent.split(" ")[2];
       var message = "Identified as " + username;
       $messageTextBox.data("messagetype", "BROADCAST");
+      addMessage(message);
     }
     else if (command === "BROADCAST")
     {
       var split = web_socket_message.split(" ");
       var sender = split[2];
       var message = sender + ": " + split.splice(3, split.length).join(" ");
+      addMessage(message);
     }
     else if (command === "WHO HERE")
     {
-      var message = "Users online: " + web_socket_message;
+      var message =  web_socket_message + "|";
+      for (var i = 0; i < message.split("|").length; ++i)
+      { 
+        addUser(message.split("|")[i]);
+      }
     }
 
-    addMessage(message);
   }
 
   web_socket.onclose = function(e)
@@ -87,5 +98,11 @@ $(document).ready(function()
 
     web_socket.send(messageSent);
     $('#inputMessage').val("");
+  });
+
+  $refreshButton.click(function()
+  {
+    console.log($refreshButton.data("messagetype"));
+    web_socket.send($refreshButton.data("messagetype"));
   });
 });

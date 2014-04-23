@@ -45,7 +45,7 @@
 
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title">Chat With the Crew</h3>
+              <h3 class="panel-title">Chat With da Crew</h3>
             </div>
 
             <div class="panel-body">
@@ -55,8 +55,13 @@
             </div>
 
             <div class="panel-footer">
-              <input type="text" id="inputMessage" data-messagetype="ME IS">
-              <button id="sendButton">Send</button>
+              <form class="form-inline" role="form">
+                <div class="form-group">
+                  <textarea id="inputMessage" data-messagetype="ME IS" class="form-control"></textarea>
+                </div>
+
+                <button type="button" id="sendButton" class="btn btn-primary">Send</button>
+              </form>
             </div>
           </div>
 
@@ -71,13 +76,15 @@
 
             <div class="panel-body">
               <div class="well">
-                <div id="who-here-output"></div>
+                <div id="who-here-output">
+                  <p class="output"></p>
+                </div>
               </div>
             </div>
 
             <div class="panel-footer">
               <center>
-                <button id="refreshButton" data-messagetype="WHO HERE">Refresh</button>
+                <button id="refreshButton" data-messagetype="WHO HERE" class="btn btn-primary btn-block">Refresh</button>
               </center>
             </div>
           </div>

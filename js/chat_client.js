@@ -1,17 +1,19 @@
-var addMessage = function(s)
+var addMessage = function(output)
 {
-  $('#output').append("<div class='message'>" + s + "</div>");
+  $('#output').append("<div class='message'>" + output + "</div>");
 }
 
-var addUser = function(s)
+var addUser = function(output)
 {
-  $('#who-here-output').append("<div class='message'>" + s + "</div>");
+  // TODO
+  $('#who-here-output').append("<div class='message'>" + output + "</div>");
 }
 
 $(document).ready(function()
 {
   $messageTextBox = $('#inputMessage');
   $refreshButton = $('#refreshButton');
+  $sendButton = $('#sendButton');
   var commands = ["BROADCAST", "ME IS", "WHO HERE"];
   var command = "";
   var messageSent = "";
@@ -24,7 +26,7 @@ $(document).ready(function()
 
   if (!window.WebSocket)
   {
-    alert("NO! WebSocket is NOT available in this (sucky) browser.");
+    alert("WebSocket is NOT available in this (sucky) browser.");
   }
 
   var url = 'ws://localhost:8787/chat';
@@ -61,6 +63,7 @@ $(document).ready(function()
       username = messageSent.split(" ")[2];
       var message = "Identified as " + username;
       $messageTextBox.data("messagetype", "BROADCAST");
+
       addMessage(message);
     }
     else if (command === "BROADCAST")
@@ -68,13 +71,15 @@ $(document).ready(function()
       var split = web_socket_message.split(" ");
       var sender = split[2];
       var message = sender + ": " + split.splice(3, split.length).join(" ");
+
       addMessage(message);
     }
     else if (command === "WHO HERE")
     {
+      // TODO
       var message =  web_socket_message + "|";
       for (var i = 0; i < message.split("|").length; ++i)
-      { 
+      {
         addUser(message.split("|")[i]);
       }
     }
@@ -91,7 +96,7 @@ $(document).ready(function()
     addMessage('error');
   }
 
-  $('#sendButton').click(function()
+  $sendButton.click(function()
   {
     messageSent = $messageTextBox.data("messagetype") + " " + $messageTextBox.val();
     console.log(messageSent);
@@ -102,7 +107,8 @@ $(document).ready(function()
 
   $refreshButton.click(function()
   {
-    console.log($refreshButton.data("messagetype"));
-    web_socket.send($refreshButton.data("messagetype"));
+    messageSent = $refreshButton.data("messagetype");
+    console.log(messageSent);
+    web_socket.send(messageSent);
   });
 });

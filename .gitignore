@@ -1,5 +1,5 @@
-chatserver-first
-base64.c
-base64.o
-chat-server.c
-sha1-c/*
+*.o
+*.c
+*.exe
+*.out
+*.app

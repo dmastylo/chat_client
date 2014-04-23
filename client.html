@@ -15,68 +15,7 @@
     <!-- Latest compiled and minified JavaScript -->
     <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
-    <script>
-      var log = function(s)
-      {
-        if (document.readyState !== 'complete')
-        {
-          log.buffer.push(s);
-        }
-        else
-        {
-          $('#output').append("<div class='message'>" + s + "</div>");
-        }
-      }
-
-      $(document).ready(function()
-      {
-        log.buffer = [];
-
-        if (this.MozWebSocket)
-        {
-          WebSocket = MozWebSocket;
-        }
-
-        if (!window.WebSocket)
-        {
-          alert("NO! WebSocket is NOT available in this (sucky) browser.");
-        }
-
-        url = 'ws://localhost:8787/chat';
-        w = new WebSocket(url);
-
-        w.onopen = function()
-        {
-          log('open');
-          // w.send('ME IS Damian');
-          // w.binaryType = 'arraybuffer';
-          // var a = new Uint8Array([ 1,2,3,4,5,6,7,8 ]);
-          // w.send(a.buffer);
-        }
-
-        w.onmessage = function(e)
-        {
-          log(e.data.toString());
-        }
-
-        w.onclose = function(e)
-        {
-          log('closed');
-        }
-
-        w.onerror = function(e)
-        {
-          log('error');
-        }
-
-        log(log.buffer.join("\n"));
-
-        $('#sendButton').click(function()
-        {
-          w.send($('#inputMessage').val());
-        });
-      });
-    </script>
+    <script src="js/chat_client.js"></script>
 
   </head>
 
@@ -116,7 +55,7 @@
             </div>
 
             <div class="panel-footer">
-              <input type="text" id="inputMessage" value="ME IS Damian">
+              <input type="text" id="inputMessage" data-messageType="ME IS">
               <button id="sendButton">Send</button>
             </div>
           </div>

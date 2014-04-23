@@ -6,7 +6,7 @@ var addMessage = function(s)
 $(document).ready(function()
 {
   $messageTextBox = $('#inputMessage');
-  var commands = ["BROADCAST"];
+  var commands = ["BROADCAST", "ME IS"];
   var command = "";
   var messageSent = "";
 
@@ -35,15 +35,18 @@ $(document).ready(function()
   {
     var web_socket_message = e.data.toString();
     console.log(web_socket_message);
+    console.log(messageSent);
 
     // Determine command
     for (var i = 0; i < commands.length; ++i)
     {
-      if (web_socket_message.lastIndexOf(commands[i], 0) === 0)
+      if (messageSent.lastIndexOf(commands[i], 0) === 0)
       {
         command = commands[i];
       }
     }
+
+    console.log(command);
 
     // Filter output according to command given
     if (command === "ME IS")

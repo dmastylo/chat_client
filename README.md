@@ -3,4 +3,5 @@ chat_client
 
 Homework: Chat client to connect to chat server with websockets
 
-Damian, tell me how to run this. Run chatserver2.c file, then navigate to html page?
+Look in chatserver-v2 and follow compiling directions on chat-server.c. Run the
+executable then just navigate to the client.html file in your browser.

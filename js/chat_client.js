@@ -9,6 +9,7 @@ $(document).ready(function()
   var commands = ["BROADCAST", "ME IS"];
   var command = "";
   var messageSent = "";
+  var username = "";
 
   if (this.MozWebSocket)
   {

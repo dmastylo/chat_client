@@ -1,9 +1,9 @@
-var addMessage = function(output)
+var add_message = function(display_area, output)
 {
-  $('#output').append("<div class='message'>" + output + "</div>");
+  display_area.append("<div class='message'>" + output + "</div>");
 }
 
-var addUser = function(output)
+var add_user = function(output)
 {
   // TODO
   $('#who-here-output').append("<div class='message'>" + output + "</div>");
@@ -11,12 +11,14 @@ var addUser = function(output)
 
 $(document).ready(function()
 {
-  $messageTextBox = $('#inputMessage');
-  $refreshButton = $('#refreshButton');
-  $sendButton = $('#sendButton');
-  var commands = ["BROADCAST", "ME IS", "WHO HERE"];
-  var command = "";
-  var messageSent = "";
+  $message_text_box = $('#inputMessage');
+  $refresh_button = $('#refreshButton');
+  $send_button = $('#sendButton');
+  $send_pm_button = $('#sendPMButton');
+  $mainOutput = $('#mainOutput');
+  var server_responses = ["OK", "BROADCAST FROM", "PRIVATE FROM"];
+  var commands = ["ME IS", "BROADCAST", "WHO HERE"];
+  var message_sent = "";
   var username = "";
 
   if (this.MozWebSocket)
@@ -34,7 +36,7 @@ $(document).ready(function()
 
   web_socket.onopen = function()
   {
-    addMessage("Please enter your username in the textbox below.");
+    add_message($mainOutput, "Please enter your username in the textbox below.");
     // web_socket.binaryType = 'arraybuffer';
     // var a = new Uint8Array([ 1,2,3,4,5,6,7,8 ]);
     // web_socket.send(a.buffer);
@@ -42,73 +44,104 @@ $(document).ready(function()
 
   web_socket.onmessage = function(e)
   {
+    var server_response;
     var web_socket_message = e.data.toString();
     console.log(web_socket_message);
-    console.log(messageSent);
+    console.log(message_sent);
 
-    // Determine command
-    for (var i = 0; i < commands.length; ++i)
+    // Determine server_response
+    for (var i = 0; i < server_responses.length; ++i)
     {
-      if (messageSent.lastIndexOf(commands[i], 0) === 0)
+      if (web_socket_message.lastIndexOf(server_responses[i], 0) === 0)
       {
-        command = commands[i];
+        server_response = server_responses[i];
       }
     }
 
-    console.log(command);
+    console.log(server_response);
 
-    // Filter output according to command given
-    if (command === "ME IS")
+    if (server_response === "OK")
     {
-      username = messageSent.split(" ")[2];
+      username = message_sent.split(" ")[2];
       var message = "Identified as " + username;
-      $messageTextBox.data("messagetype", "BROADCAST");
+      $message_text_box.data("messagetype", "BROADCAST");
 
-      addMessage(message);
+      add_message($mainOutput, message);
     }
-    else if (command === "BROADCAST")
+    else if (server_response === "BROADCAST FROM")
     {
+      // Figure out the sender
       var split = web_socket_message.split(" ");
       var sender = split[2];
+
       var message = sender + ": " + split.splice(3, split.length).join(" ");
 
-      addMessage(message);
+      add_message($mainOutput, message);
     }
-    else if (command === "WHO HERE")
+    else if (server_response === "PRIVATE FROM")
     {
+      // Figure out the sender
+      var lines = web_socket_message.split("\n");
+      var message = lines[1];
+      var sender = lines[0].split(" ")[2];
+
       // TODO
+      // First check if conversation already exists
+
+      // Add a new tab for the private message
+      $("<li><a href='#" + sender + "' tabindex='-1' data-toggle='tab'>" + sender + "</a></li>")
+          .appendTo('#privateMessageTabs');
+
+      // Add a new tab-pane for the private message
+      var newPMTab = $($('.privateMessageTemplate').html())
+          .attr('id', sender)
+          .appendTo('.tab-content');
+
+      newPMTab.find(".panel-title").html("PM with " + sender);
+      add_message(newPMTab.find(".output"), message);
+    }
+    else
+    {
       var message =  web_socket_message + "|";
       for (var i = 0; i < message.split("|").length; ++i)
       {
-        addUser(message.split("|")[i]);
+        add_user(message.split("|")[i]);
       }
     }
-
   }
 
   web_socket.onclose = function(e)
   {
-    addMessage('closed');
+    add_message($mainOutput, 'closed');
   }
 
   web_socket.onerror = function(e)
   {
-    addMessage('error');
+    add_message($mainOutput, 'error');
   }
 
-  $sendButton.click(function()
+  $send_button.click(function()
   {
-    messageSent = $messageTextBox.data("messagetype") + " " + $messageTextBox.val();
-    console.log(messageSent);
+    message_sent = $message_text_box.data("messagetype") + " " + $message_text_box.val();
+    console.log(message_sent);
 
-    web_socket.send(messageSent);
+    web_socket.send(message_sent);
     $('#inputMessage').val("");
   });
 
-  $refreshButton.click(function()
+  $send_pm_button.click(function()
   {
-    messageSent = $refreshButton.data("messagetype");
-    console.log(messageSent);
-    web_socket.send(messageSent);
+    message_sent = $('#pmMessage').data("messagetype") + "\n" + $('#pmMessage').val();
+    console.log(message_sent);
+
+    web_socket.send(message_sent);
+    $('#pmMessage').val("");
+  });
+
+  $refresh_button.click(function()
+  {
+    message_sent = $refresh_button.data("messagetype");
+    console.log(message_sent);
+    web_socket.send(message_sent);
   });
 });

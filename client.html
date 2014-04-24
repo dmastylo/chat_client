@@ -2,17 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Chat Client</title>
 
-    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 
-    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="css/custom.css">
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 
-    <!-- Latest compiled and minified JavaScript -->
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
     <script src="js/chat_client.js"></script>
@@ -38,31 +36,55 @@
       </div>
     </div>
 
-
     <div class="container">
       <div class="row">
         <div class="col-md-9">
 
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">Chat With da Crew</h3>
-            </div>
+          <ul class="nav nav-tabs" id="myTab">
+            <li class="active"><a href="#main" data-toggle="tab">Main</a></li>
+            <li class="dropdown">
+              <a href="#" id="myTabDrop1" class="dropdown-toggle" data-toggle="dropdown">Private Messages <b class="caret"></b></a>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="myTabDrop1" id="privateMessageTabs">
+                <li><a href="#chris" tabindex="-1" data-toggle="tab">Chris</a></li>
+                <li><a href="#austin" tabindex="-1" data-toggle="tab">Austin</a></li>
+              </ul>
+            </li>
+          </ul>
 
-            <div class="panel-body">
-              <div class="well">
-                <div id="output"></div>
+          <div class="tab-content">
+            <div class="tab-pane active" id="main">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h3 class="panel-title">Chat With da Crew</h3>
+                </div>
+
+                <div class="panel-body">
+                  <div class="well">
+                    <div id="mainOutput"></div>
+                  </div>
+                </div>
+
+                <div class="panel-footer">
+                  <form class="form-inline" role="form">
+                    <div class="form-group">
+                      <textarea id="inputMessage" data-messagetype="ME IS" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button type="button" id="sendButton" class="btn btn-primary">Send</button>
+
+                    <div class="form-group">
+                      <textarea id="pmMessage" data-messagetype="SEND Chris" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button type="button" id="sendPMButton" class="btn btn-primary">Send PM</button>
+
+                  </form>
+                </div>
               </div>
             </div>
 
-            <div class="panel-footer">
-              <form class="form-inline" role="form">
-                <div class="form-group">
-                  <textarea id="inputMessage" data-messagetype="ME IS" class="form-control"></textarea>
-                </div>
-
-                <button type="button" id="sendButton" class="btn btn-primary">Send</button>
-              </form>
+            <div class="tab-pane" id="austin">
+              Mega meow
             </div>
+
           </div>
 
         </div>
@@ -83,15 +105,39 @@
             </div>
 
             <div class="panel-footer">
-              <center>
-                <button id="refreshButton" data-messagetype="WHO HERE" class="btn btn-primary btn-block">Refresh</button>
-              </center>
+              <button id="refreshButton" data-messagetype="WHO HERE" class="btn btn-primary btn-block">Refresh</button>
             </div>
           </div>
 
         </div>
       </div>
     </div>
+
+    <div class="privateMessageTemplate">
+      <div class="tab-pane">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">User Here</h3>
+          </div>
+
+          <div class="panel-body">
+            <div class="well">
+              <div class="output"></div>
+            </div>
+          </div>
+
+          <div class="panel-footer">
+            <form class="form-inline" role="form">
+              <div class="form-group">
+                <textarea data-messagetype="SEND usernamehere" class="pmMessage form-control" rows="3"></textarea>
+              </div>
+              <button type="button" class="sendPMButton btn btn-primary">Send PM</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </body>
 
 </html>

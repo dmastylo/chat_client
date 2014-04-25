@@ -20,6 +20,9 @@ $(document).ready(function()
   var message_sent = "";
   var username = "";
 
+  // Start polling for users
+  retreive_users();
+
   if (this.MozWebSocket)
   {
     WebSocket = MozWebSocket;
@@ -147,4 +150,13 @@ $(document).ready(function()
     console.log(message_sent);
     web_socket.send(message_sent);
   });
+  
+  function retreive_users()
+  {
+    $refresh_button.click();
+
+    setTimeout(function(){ 
+      retreive_users();
+    }, 5000);
+  }
 });

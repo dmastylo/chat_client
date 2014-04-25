@@ -5,7 +5,6 @@ var add_message = function(display_area, output)
 
 var add_user = function(output)
 {
-  // TODO
   $('#who-here-output').append("<div class='message'>" + output + "</div>");
 }
 
@@ -102,10 +101,14 @@ $(document).ready(function()
     }
     else
     {
-      var message =  web_socket_message + "|";
-      for (var i = 0; i < message.split("|").length; ++i)
+      // Clear out users
+      $('#who-here-output').html('');
+
+      // Gather and fill in users
+      var message =  web_socket_message;
+      for (var i = 0; i < message.split(",").length; ++i)
       {
-        add_user(message.split("|")[i]);
+        add_user(message.split(",")[i]);
       }
     }
   }

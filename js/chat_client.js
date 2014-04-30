@@ -1,14 +1,3 @@
-var add_message = function(display_area, output)
-{
-  display_area.append("<div class='message'>" + output + "</div>");
-}
-
-var add_user = function(output)
-{
-  // TODO
-  $('#who-here-output').append("<div class='message'>" + output + "</div>");
-}
-
 $(document).ready(function()
 {
   $message_text_box = $('#inputMessage');
@@ -20,6 +9,11 @@ $(document).ready(function()
   var commands = ["ME IS", "BROADCAST", "WHO HERE"];
   var message_sent = "";
   var username = "";
+  var users = [];
+  var uniqueUsers = [];
+
+  // Start polling for users
+  retreive_users();
 
   if (this.MozWebSocket)
   {
@@ -102,11 +96,22 @@ $(document).ready(function()
     }
     else
     {
-      var message =  web_socket_message + "|";
-      for (var i = 0; i < message.split("|").length; ++i)
+      // Clear out users
+      $('#who-here-output').html('');
+
+      // Gather and fill in users
+      var message =  web_socket_message;
+      var tmpUser;
+      for (var i = 0; i < message.split(",").length; ++i)
       {
-        add_user(message.split("|")[i]);
+        tmpUser = message.split(",")[i];
+        add_user(tmpUser);
+        users.push(tmpUser);
       }
+
+      $.each(users, function(i, el){
+        if($.inArray(el, uniqueUsers) === -1) uniqueUsers.push(el);
+      });
     }
   }
 
@@ -144,4 +149,45 @@ $(document).ready(function()
     console.log(message_sent);
     web_socket.send(message_sent);
   });
+
+  var add_message = function(display_area, output)
+  {
+    output = detect_users_in_text(output);
+    display_area.append("<div class='message'>" + output + "</div>");
+  }
+
+  var add_user = function(output)
+  {
+    output = detect_users_in_text(output);
+    $('#who-here-output').append("<div class='message'>" + output + "</div>");
+  }
+  
+  function retreive_users()
+  {
+    $refresh_button.click();
+
+    setTimeout(function(){ 
+      retreive_users();
+    }, 5000);
+  }
+
+  function replaceAll(find, replace, str)
+  {
+    return str.replace(new RegExp(find, 'g'), replace);
+  }
+
+  function detect_users_in_text(output)
+  {
+    // For each unique user
+    for(var i = 0; i < uniqueUsers.length; ++i)
+    {
+
+      var user_link = "<a class='users" + i%16 + "'>" + uniqueUsers[i] + "</a>";
+
+      // Replace user in output with proper a tag
+      output = replaceAll(uniqueUsers[i], user_link, output);
+    }
+
+    return output;
+  }
 });

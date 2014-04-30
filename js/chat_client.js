@@ -82,7 +82,7 @@ $(document).ready(function()
     {
       // Figure out the sender
       var lines = web_socket_message.split("\n");
-      var message = lines[1];
+      var message = sender + ": " + lines[1];
       var sender = lines[0].split(" ")[2];
 
       // TODO

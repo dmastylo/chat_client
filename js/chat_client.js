@@ -5,24 +5,15 @@ $(document).ready(function()
   $send_button = $('#sendButton');
   $send_pm_button = $('#sendPMButton');
   $mainOutput = $('#mainOutput');
+  $whoHereOutput = $('#who-here-output');
   var server_responses = ["OK", "BROADCAST FROM", "PRIVATE FROM"];
   var commands = ["ME IS", "BROADCAST", "WHO HERE"];
   var message_sent = "";
   var username = "";
   var users = [];
 
-  // Start polling for users
-  retreive_users();
-
-  if (this.MozWebSocket)
-  {
-    WebSocket = MozWebSocket;
-  }
-
-  if (!window.WebSocket)
-  {
-    alert("WebSocket is NOT available in this (sucky) browser.");
-  }
+  if (this.MozWebSocket) WebSocket = MozWebSocket;
+  if (!window.WebSocket) alert("WebSocket is NOT available in this (sucky) browser.");
 
   var url = 'ws://localhost:8787/chat';
   var web_socket = new WebSocket(url);
@@ -30,6 +21,9 @@ $(document).ready(function()
   web_socket.onopen = function()
   {
     add_message($mainOutput, "Please enter your username in the textbox below.");
+
+    // Start polling for users
+    retreive_users();
   }
 
   web_socket.onmessage = function(e)
@@ -96,7 +90,7 @@ $(document).ready(function()
       // currently online
 
       // Clear out users
-      $('#who-here-output').html('');
+      $whoHereOutput.html('');
 
       // Gather and fill in users
       users.length = 0;
@@ -106,7 +100,7 @@ $(document).ready(function()
       {
         var tmpUser = $.trim(message.split(",")[i]);
         users.push(tmpUser);
-        add_user(tmpUser);
+        add_message($whoHereOutput, tmpUser);
       }
 
       console.log(users);
@@ -115,12 +109,12 @@ $(document).ready(function()
 
   web_socket.onclose = function(e)
   {
-    add_message($mainOutput, 'closed');
+    add_message($mainOutput, 'Connection closed');
   }
 
   web_socket.onerror = function(e)
   {
-    add_message($mainOutput, 'error');
+    add_message($mainOutput, 'Error from server');
   }
 
   $send_button.click(function()
@@ -141,28 +135,31 @@ $(document).ready(function()
     $('#pmMessage').val("");
   });
 
-  $refresh_button.click(function()
+  $refresh_button.click(refresh_user_list);
+
+  $('.users').click(function()
   {
-    message_sent = $refresh_button.data("messagetype");
-    console.log(message_sent);
-    web_socket.send(message_sent);
+    console.log("USER CLICKED");
   });
 
   var add_message = function(display_area, output)
   {
     output = detect_users_in_text(output);
     display_area.append("<div class='message'>" + output + "</div>");
-  }
-
-  var add_user = function(output)
-  {
-    output = detect_users_in_text(output);
-    $('#who-here-output').append("<div class='message'>" + output + "</div>");
+    display_area.find("a").each(function(index, value)
+    {
+      // console.log('div' + index + ':' + $(this).attr('id'));
+      $(this).click(function()
+      {
+        console.log("recipient is: " + $(this).html());
+        add_new_pm_tab($(this).html());
+      });
+    });
   }
 
   function retreive_users()
   {
-    $refresh_button.click();
+    refresh_user_list();
 
     setTimeout(function()
     {
@@ -170,22 +167,50 @@ $(document).ready(function()
     }, 5000);
   }
 
-  function replaceAll(find, replace, str)
+  function replace_all(find, replace, str)
   {
     return str.replace(new RegExp(find, 'g'), replace);
   }
 
   function detect_users_in_text(output)
   {
+    ;
     // For each unique user
     for(var i = 0; i < users.length; ++i)
     {
-      var user_link = "<a class='users" + (i % 16) + "'>" + users[i] + "</a>";
+      var user_link = "<a href='#' class='users" + (i % 16) + "'>" + users[i] + "</a>";
 
       // Replace user in output with proper a tag
-      output = replaceAll(users[i], user_link, output);
+      output = replace_all(users[i], user_link, output);
     }
 
     return output;
+  }
+
+  function refresh_user_list()
+  {
+    message_sent = $refresh_button.data("messagetype");
+    console.log(message_sent);
+    web_socket.send(message_sent);
+  }
+
+  function add_new_pm_tab(recipient)
+  {
+    // TODO
+    // First check if conversation already exists
+
+    // Add a new tab for the private message
+    $("<li><a href='#" + recipient + "' tabindex='-1' data-toggle='tab'>" + recipient + "</a></li>")
+        .appendTo('#privateMessageTabs');
+
+    // Add a new tab-pane for the private message
+    var newPMTab = $($('.privateMessageTemplate').html())
+        .attr('id', recipient)
+        .appendTo('.tab-content');
+
+    newPMTab.find(".panel-title").html("PM with " + recipient);
+
+    // Make new private message screen active
+    $('#privateMessageTabs a[href="#' + recipient + '"]').tab('show');
   }
 });

@@ -10,7 +10,6 @@ $(document).ready(function()
   var message_sent = "";
   var username = "";
   var users = [];
-  var uniqueUsers = [];
 
   // Start polling for users
   retreive_users();
@@ -31,9 +30,6 @@ $(document).ready(function()
   web_socket.onopen = function()
   {
     add_message($mainOutput, "Please enter your username in the textbox below.");
-    // web_socket.binaryType = 'arraybuffer';
-    // var a = new Uint8Array([ 1,2,3,4,5,6,7,8 ]);
-    // web_socket.send(a.buffer);
   }
 
   web_socket.onmessage = function(e)
@@ -96,22 +92,24 @@ $(document).ready(function()
     }
     else
     {
+      // Assume what we're getting from the server is the list of users
+      // currently online
+
       // Clear out users
       $('#who-here-output').html('');
 
       // Gather and fill in users
-      var message =  web_socket_message;
-      var tmpUser;
+      users.length = 0;
+      var message = web_socket_message;
+
       for (var i = 0; i < message.split(",").length; ++i)
       {
-        tmpUser = message.split(",")[i];
-        add_user(tmpUser);
+        var tmpUser = $.trim(message.split(",")[i]);
         users.push(tmpUser);
+        add_user(tmpUser);
       }
 
-      $.each(users, function(i, el){
-        if($.inArray(el, uniqueUsers) === -1) uniqueUsers.push(el);
-      });
+      console.log(users);
     }
   }
 
@@ -161,12 +159,13 @@ $(document).ready(function()
     output = detect_users_in_text(output);
     $('#who-here-output').append("<div class='message'>" + output + "</div>");
   }
-  
+
   function retreive_users()
   {
     $refresh_button.click();
 
-    setTimeout(function(){ 
+    setTimeout(function()
+    {
       retreive_users();
     }, 5000);
   }
@@ -179,13 +178,12 @@ $(document).ready(function()
   function detect_users_in_text(output)
   {
     // For each unique user
-    for(var i = 0; i < uniqueUsers.length; ++i)
+    for(var i = 0; i < users.length; ++i)
     {
-
-      var user_link = "<a class='users" + i%16 + "'>" + uniqueUsers[i] + "</a>";
+      var user_link = "<a class='users" + (i % 16) + "'>" + users[i] + "</a>";
 
       // Replace user in output with proper a tag
-      output = replaceAll(uniqueUsers[i], user_link, output);
+      output = replaceAll(users[i], user_link, output);
     }
 
     return output;

@@ -1,0 +1,176 @@
+[04/21/2014]
+
+Project #3 grades are in LMS
+ (grading criteria on course website)
+ (bring grading questions to Shigeru)
+
+
+Updated schedule with FINAL EXAM DAY/TIME/LOCATION
+ (email me ASAP if you have a conflict or
+    require special accomodations)
+
+Project #4 -- JQuery is okay
+
+==================================================
+
+XHTML describes the structure of a document
+  (i.e. the content)
+
+Presentation aspects implemented via CSS
+
+Behavior (interactive functionality) aspects
+ implemented via JavaScript
+
+body { background-color: yellow; }
+
+h1 { color: green; background-color: black; }
+
+body and h1 (and so on) are called selectors
+  (i.e. name of an XHTML tag that we're selecting
+       to style)
+
+xyz { color: purple; }
+
+
+<selector> { <declarations> }
+
+ each declaration is <property>: <value>;
+
+Collection of style rules is a style sheet
+
+==================================================
+
+XML (eXtensible Markup Language)
+-- document must have ONE root element  <html>
+
+-- tags/elements MUST be properly nested
+   <b><i>woeifjweoi</b></i>   <=== WRONG
+
+-- tags/elements MUST always be closed
+   <p> wefoiwjefoiwej </p>
+
+   <br />
+   <img src="..." />
+
+-- tags/elements MUST be entirely in lowercase
+
+-- attributes MUST also be entirely in lowercase
+
+   <img src="images/xyz.jpg" width="420" ... />
+        ^^^                  ^^^^^
+         |                     |
+      attribute            attribute
+
+
+    onclick onfocus onblur onmessage
+
+-- attribute values must always be double-quoted
+
+        &quot;    &lt; &gt;   &amp;
+
+
+-- attributes MUST not be minimized....
+
+     <input checked type="checkbox" ... />
+
+     <input checked="checked" type="checkbox" ... />
+
+-- an XHTML document MUST have a DOCTYPE declaration
+
+-- for XHTML documents, these tags are required:
+    <html>, <head>, <title>, <body>
+
+
+
+
+
+
+<classroom>
+  <location>DCC 337</location>
+  <capacity>120</capacity>
+  <podium>working</podium>
+  <student>John Smith</student>
+  <student>Mary Jones</student>
+  <numberOfSeats>118</numberOfSeats>
+</classroom>
+
+
+In the DTD, we can specify the following:
+
+  (im*)    0 or more <im> elements
+  (im+)    1 or more <im> elements
+  (im?)    0 or 1 <im> elements
+  (a|b|c)  select from multiple values
+
+  <!ATTLIST para size (small|large) "small">
+            ^^^^ ^^^^ ^^^^^^^^^^^^^ ^^^^^^^
+             |     |          |       |
+             |     |          |     default value
+             |     |          |
+            tag   attr   list of possible
+                             values
+
+
+define aliases within a DTD
+  (then use it within an XML document):
+
+ <!ENTITY current_semester "Spring 2014">
+
+ <semester> &current_semester; </semester>
+
+
+
+Well-Formed and Valid documents:
+
+-- a document that has proper XML (XHTML) syntax
+    is "Well-Formed"
+
+-- a document that also has a DTD and obeys the
+    rules of the DTD is "Valid"
+
+
+
+
+
+
+
+
+note the namespace for student below....
+
+<?xml version="1.0"?>
+<!DOCTYPE student SYSTEM "student.dtd">
+<deg:student>
+  <first>Joe</first>
+  <middle>X.</middle>
+  <last>Smith</last>
+  <rid>660012345</rid>
+  <address>123 main street</address>
+  <phone>555-2929</phone>
+  <im>jsiscool</im>
+  <courses semester="fall02">
+    <course>
+      <name>Exploiting the Information World</name>
+      <crn>12345</crn>
+      <num>ITEC-2110</num>
+    </course>
+
+    <course>
+     <name>XML DTD Creation</name>
+     <crn>82828</crn>
+     <crn>82839</crn>
+     <num>XML-2250</num>
+    </course>
+  </courses>
+
+</deg:student>
+
+
+
+
+
+
+
+
+
+
+

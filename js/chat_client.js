@@ -69,20 +69,7 @@ $(document).ready(function()
       var message = sender + ": " + lines[1];
       var sender = lines[0].split(" ")[2];
 
-      // TODO
-      // First check if conversation already exists
-
-      // Add a new tab for the private message
-      $("<li><a href='#" + sender + "' tabindex='-1' data-toggle='tab'>" + sender + "</a></li>")
-          .appendTo('#privateMessageTabs');
-
-      // Add a new tab-pane for the private message
-      var newPMTab = $($('.privateMessageTemplate').html())
-          .attr('id', sender)
-          .appendTo('.tab-content');
-
-      newPMTab.find(".panel-title").html("PM with " + sender);
-      add_message(newPMTab.find(".output"), message);
+      add_new_pm_tab(sender, message);
     }
     else
     {
@@ -117,42 +104,40 @@ $(document).ready(function()
     add_message($mainOutput, 'Error from server');
   }
 
-  $send_button.click(function()
-  {
-    message_sent = $message_text_box.data("messagetype") + " " + $message_text_box.val();
-    console.log(message_sent);
-
-    web_socket.send(message_sent);
-    $('#inputMessage').val("");
-  });
-
-  $send_pm_button.click(function()
-  {
-    message_sent = $('#pmMessage').data("messagetype") + "\n" + $('#pmMessage').val();
-    console.log(message_sent);
-
-    web_socket.send(message_sent);
-    $('#pmMessage').val("");
-  });
-
+  $send_button.click(send_to_server);
+  $send_pm_button.click(send_to_server);
   $refresh_button.click(refresh_user_list);
 
-  $('.users').click(function()
+  function send_to_server()
   {
-    console.log("USER CLICKED");
-  });
+    var textarea = $(this).siblings().find('textarea');
+    var message_type = textarea.data("messagetype");
+    if (message_type.lastIndexOf("SEND", 0) === 0)
+    {
+      var splitter = "\n";
+    }
+    else
+    {
+      var splitter = " ";
+    }
 
-  var add_message = function(display_area, output)
+    message_sent = textarea.data("messagetype") + splitter + textarea.val();
+    console.log(message_sent);
+    web_socket.send(message_sent);
+
+    textarea.val("");
+  }
+
+  function add_message(display_area, output)
   {
     output = detect_users_in_text(output);
     display_area.append("<div class='message'>" + output + "</div>");
     display_area.find("a").each(function(index, value)
     {
-      // console.log('div' + index + ':' + $(this).attr('id'));
       $(this).click(function()
       {
         console.log("recipient is: " + $(this).html());
-        add_new_pm_tab($(this).html());
+        add_new_pm_tab($(this).html(), false);
       });
     });
   }
@@ -174,7 +159,6 @@ $(document).ready(function()
 
   function detect_users_in_text(output)
   {
-    ;
     // For each unique user
     for(var i = 0; i < users.length; ++i)
     {
@@ -194,7 +178,7 @@ $(document).ready(function()
     web_socket.send(message_sent);
   }
 
-  function add_new_pm_tab(recipient)
+  function add_new_pm_tab(recipient, message)
   {
     // TODO
     // First check if conversation already exists
@@ -209,8 +193,16 @@ $(document).ready(function()
         .appendTo('.tab-content');
 
     newPMTab.find(".panel-title").html("PM with " + recipient);
+    newPMTab.find("textarea").attr("data-messagetype", "SEND " + recipient);
 
     // Make new private message screen active
     $('#privateMessageTabs a[href="#' + recipient + '"]').tab('show');
+
+    // TODO add a click handler for the Send PM button
+
+    if (message)
+    {
+      add_message(newPMTab.find(".output"), message);
+    }
   }
 });

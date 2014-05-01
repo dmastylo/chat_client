@@ -46,7 +46,7 @@ $(document).ready(function()
 
     if (server_response === "OK")
     {
-      username = message_sent.split(" ")[2];
+      username = message_sent.split(" ")[2].trim();
       var message = "Identified as " + username;
       $message_text_box.data("messagetype", "BROADCAST");
 
@@ -66,8 +66,8 @@ $(document).ready(function()
     {
       // Figure out the sender
       var lines = web_socket_message.split("\n");
-      var message = sender + ": " + lines[1];
       var sender = lines[0].split(" ")[2];
+      var message = sender + ": " + lines[1];
 
       add_new_pm_tab(sender, message);
     }
@@ -110,22 +110,29 @@ $(document).ready(function()
 
   function send_to_server()
   {
-    var textarea = $(this).siblings().find('textarea');
-    var message_type = textarea.data("messagetype");
+    var $textarea = $(this).siblings().find('textarea');
+    var message_type = $textarea.data("messagetype");
+
+    // The SEND command requires a newline before the actual message
     if (message_type.lastIndexOf("SEND", 0) === 0)
     {
       var splitter = "\n";
+
+      // Add the output of the message to the display
+      var display_message = username + ": " + $textarea.val();
+      add_message($textarea.parents('.panel').find('.output'), display_message);
     }
     else
     {
       var splitter = " ";
     }
 
-    message_sent = textarea.data("messagetype") + splitter + textarea.val();
+    message_sent = $textarea.data("messagetype") + splitter + $textarea.val();
     console.log(message_sent);
     web_socket.send(message_sent);
 
-    textarea.val("");
+    // Clear the textarea
+    $textarea.val("");
   }
 
   function add_message(display_area, output)
@@ -180,29 +187,36 @@ $(document).ready(function()
 
   function add_new_pm_tab(recipient, message)
   {
-    // TODO
     // First check if conversation already exists
+    if ($('#' + recipient).length)
+    {
+      var PMTab = $('#' + recipient);
+      $('#privateMessageTabs a[href="#' + recipient + '"]').tab('show');
+    }
+    else
+    {
+      // Add a new tab for the private message
+      $("<li><a href='#" + recipient + "' tabindex='-1' data-toggle='tab'>" + recipient + "</a></li>")
+          .appendTo('#privateMessageTabs');
 
-    // Add a new tab for the private message
-    $("<li><a href='#" + recipient + "' tabindex='-1' data-toggle='tab'>" + recipient + "</a></li>")
-        .appendTo('#privateMessageTabs');
+      // Add a new tab-pane for the private message
+      var PMTab = $($('.privateMessageTemplate').html())
+          .attr('id', recipient)
+          .appendTo('.tab-content');
 
-    // Add a new tab-pane for the private message
-    var newPMTab = $($('.privateMessageTemplate').html())
-        .attr('id', recipient)
-        .appendTo('.tab-content');
+      PMTab.find(".panel-title").html("Private Message with " + recipient);
+      PMTab.find("textarea").attr("data-messagetype", "SEND " + recipient);
 
-    newPMTab.find(".panel-title").html("PM with " + recipient);
-    newPMTab.find("textarea").attr("data-messagetype", "SEND " + recipient);
+      // Make new private message screen active
+      $('#privateMessageTabs a[href="#' + recipient + '"]').tab('show');
 
-    // Make new private message screen active
-    $('#privateMessageTabs a[href="#' + recipient + '"]').tab('show');
-
-    // TODO add a click handler for the Send PM button
+      // Add a click handler for the Send PM button
+      PMTab.find(".sendPMButton").click(send_to_server);
+    }
 
     if (message)
     {
-      add_message(newPMTab.find(".output"), message);
+      add_message(PMTab.find(".output"), message);
     }
   }
 });

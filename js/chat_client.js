@@ -10,7 +10,8 @@ $(document).ready(function()
   var commands = ["ME IS", "BROADCAST", "WHO HERE"];
   var message_sent = "";
   var username = "";
-  var users = [];
+  var current_users = [];
+  var persisted_users = [];
 
   if (this.MozWebSocket) WebSocket = MozWebSocket;
   if (!window.WebSocket) alert("WebSocket is NOT available in this (sucky) browser.");
@@ -31,7 +32,6 @@ $(document).ready(function()
     var server_response;
     var web_socket_message = e.data.toString();
     console.log(web_socket_message);
-    console.log(message_sent);
 
     // Determine server_response
     for (var i = 0; i < server_responses.length; ++i)
@@ -55,10 +55,9 @@ $(document).ready(function()
     else if (server_response === "BROADCAST FROM")
     {
       // Figure out the sender
-      var split = web_socket_message.split(" ");
-      var sender = split[2];
-
-      var message = sender + ": " + split.splice(3, split.length).join(" ");
+      var lines = web_socket_message.split("\n");
+      var sender = lines[0].split(" ")[2];
+      var message = sender + ": " + lines[1];
 
       add_message($mainOutput, message);
     }
@@ -78,19 +77,25 @@ $(document).ready(function()
 
       // Clear out users
       $whoHereOutput.html('');
+      current_users.length = 0;
 
-      // Gather and fill in users
-      users.length = 0;
       var message = web_socket_message;
 
       for (var i = 0; i < message.split(",").length; ++i)
       {
         var tmpUser = $.trim(message.split(",")[i]);
-        users.push(tmpUser);
+        current_users.push(tmpUser);
+
+        // Add to persisted users if they do not already exist
+        if (persisted_users.indexOf(tmpUser) === -1)
+        {
+          persisted_users.push(tmpUser);
+        }
+
         add_message($whoHereOutput, tmpUser);
       }
 
-      console.log(users);
+      console.log(current_users);
     }
   }
 
@@ -112,19 +117,18 @@ $(document).ready(function()
   {
     var $textarea = $(this).siblings().find('textarea');
     var message_type = $textarea.data("messagetype");
+    var splitter = "\n";
 
     // The SEND command requires a newline before the actual message
-    if (message_type.lastIndexOf("SEND", 0) === 0)
+    if (message_type.lastIndexOf("SEND", 0) !== 0 || message_type.lastIndexOf("BROADCAST", 0) !== 0)
     {
-      var splitter = "\n";
-
+      var splitter = " ";
+    }
+    else if(message_type.lastIndexOf("SEND", 0) === 0)
+    {
       // Add the output of the message to the display
       var display_message = username + ": " + $textarea.val();
       add_message($textarea.parents('.panel').find('.output'), display_message);
-    }
-    else
-    {
-      var splitter = " ";
     }
 
     message_sent = $textarea.data("messagetype") + splitter + $textarea.val();
@@ -139,12 +143,15 @@ $(document).ready(function()
   {
     output = detect_users_in_text(output);
     display_area.append("<div class='message'>" + output + "</div>");
+
+    // Add click handlers on the usernames that were found in the chat message
     display_area.find("a").each(function(index, value)
     {
-      $(this).click(function()
+      var $this = $(this);
+      $this.click(function()
       {
-        console.log("recipient is: " + $(this).html());
-        add_new_pm_tab($(this).html(), false);
+        console.log("recipient is: " + $this.html());
+        add_new_pm_tab($this.html(), false);
       });
     });
   }
@@ -167,12 +174,16 @@ $(document).ready(function()
   function detect_users_in_text(output)
   {
     // For each unique user
-    for(var i = 0; i < users.length; ++i)
+    for(var i = 0; i < persisted_users.length; ++i)
     {
-      var user_link = "<a href='#' class='users" + (i % 16) + "'>" + users[i] + "</a>";
+      // Check that the user is currently logged in
+      if (current_users.indexOf(persisted_users[i]) !== -1)
+      {
+        var user_link = "<a href='#' class='users" + (i % 16) + "'>" + persisted_users[i] + "</a>";
 
-      // Replace user in output with proper a tag
-      output = replace_all(users[i], user_link, output);
+        // Replace user in output with proper a tag
+        output = replace_all(persisted_users[i], user_link, output);
+      }
     }
 
     return output;

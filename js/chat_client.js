@@ -4,9 +4,10 @@ $(document).ready(function()
   $refresh_button = $('#refreshButton');
   $send_button = $('#sendButton');
   $send_pm_button = $('#sendPMButton');
-  $mainOutput = $('#mainOutput');
-  $whoHereOutput = $('#who-here-output');
-  $usernameOutput = $('#username');
+  $main_output = $('#mainOutput');
+  $who_here_output = $('#who-here-output');
+  $username_output = $('#username');
+  $logout_button = $('#logout');
   var server_responses = ["OK", "BROADCAST FROM", "PRIVATE FROM"];
   var commands = ["ME IS", "BROADCAST", "WHO HERE"];
   var message_sent = "";
@@ -22,7 +23,7 @@ $(document).ready(function()
 
   web_socket.onopen = function()
   {
-    add_message($mainOutput, "Please enter your username in the textbox below.");
+    add_message($main_output, "Please enter your username in the textbox below.");
 
     // Start polling for users
     retreive_users();
@@ -52,10 +53,17 @@ $(document).ready(function()
       $message_text_box.data("messagetype", "BROADCAST");
 
       // Add the username to the navbar at the top right
-      add_message($usernameOutput, username);
+      add_message($username_output, username);
 
       // Add the "Identified as ____" message to the main output
-      add_message($mainOutput, message);
+      add_message($main_output, message);
+
+      // Add a click handler on the logout button to make it active
+      $logout_button.click(function()
+      {
+        web_socket.send("LOGOUT");
+        add_message($main_output, "You have logged out.");
+      });
     }
     else if (server_response === "BROADCAST FROM")
     {
@@ -64,7 +72,7 @@ $(document).ready(function()
       var sender = lines[0].split(" ")[2];
       var message = sender + ": " + lines[1];
 
-      add_message($mainOutput, message);
+      add_message($main_output, message);
     }
     else if (server_response === "PRIVATE FROM")
     {
@@ -81,7 +89,7 @@ $(document).ready(function()
       // currently online
 
       // Clear out users
-      $whoHereOutput.html('');
+      $who_here_output.html('');
       current_users.length = 0;
 
       var message = web_socket_message;
@@ -97,7 +105,7 @@ $(document).ready(function()
           persisted_users.push(tmpUser);
         }
 
-        add_message($whoHereOutput, tmpUser);
+        add_message($who_here_output, tmpUser);
       }
 
       console.log(current_users);
@@ -106,19 +114,19 @@ $(document).ready(function()
 
   web_socket.onclose = function(e)
   {
-    add_message($mainOutput, 'Connection closed');
+    add_message($main_output, 'Connection closed');
   }
 
   web_socket.onerror = function(e)
   {
-    add_message($mainOutput, 'Error from server');
+    add_message($main_output, 'Error from server');
   }
 
-  $send_button.click(send_to_server);
-  $send_pm_button.click(send_to_server);
+  $send_button.click(send_to_server_with_textbox_value);
+  $send_pm_button.click(send_to_server_with_textbox_value);
   $refresh_button.click(refresh_user_list);
 
-  function send_to_server()
+  function send_to_server_with_textbox_value()
   {
     var $textarea = $(this).siblings().find('textarea');
     var message_type = $textarea.data("messagetype");
@@ -163,12 +171,15 @@ $(document).ready(function()
 
   function retreive_users()
   {
-    refresh_user_list();
-
-    setTimeout(function()
+    if (web_socket.readyState === 1)
     {
-      retreive_users();
-    }, 5000);
+      refresh_user_list();
+
+      setTimeout(function()
+      {
+        retreive_users();
+      }, 5000);
+    }
   }
 
   function replace_all(find, replace, str)
@@ -230,7 +241,7 @@ $(document).ready(function()
         $('#privateMessageTabs a[href="#' + recipient + '"]').tab('show');
 
         // Add a click handler for the Send PM button
-        PMTab.find(".sendPMButton").click(send_to_server);
+        PMTab.find(".sendPMButton").click(send_to_server_with_textbox_value);
       }
 
       if (message)

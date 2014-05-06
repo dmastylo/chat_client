@@ -93,39 +93,35 @@ $(document).ready(function()
 
       add_new_pm_tab(sender, message);
     }
+    else if($.trim(web_socket_message.split(",")[0]) == "ERROR")
+    {
+      alert("Error! Duplicate username or user is offline!");
+    }
     else
     {
       // Assume what we're getting from the server is the list of users
       // currently online
       var message = web_socket_message;
 
-      // Error checking
-      if($.trim(message.split(",")[0]) == "ERROR")
-      {
-        alert("Error! Duplicate username or user is offline!");
-      }
-      else
-      {
-        // Clear out users
-        $who_here_output.html('');
-        current_users.length = 0;
+      // Clear out users
+      $who_here_output.html('');
+      current_users.length = 0;
 
-        for (var i = 0; i < message.split(",").length; ++i)
+      for (var i = 0; i < message.split(",").length; ++i)
+      {
+        var tmpUser = $.trim(message.split(",")[i]);
+        current_users.push(tmpUser);
+
+        // Add to persisted users if they do not already exist
+        if (persisted_users.indexOf(tmpUser) === -1)
         {
-          var tmpUser = $.trim(message.split(",")[i]);
-          current_users.push(tmpUser);
-
-          // Add to persisted users if they do not already exist
-          if (persisted_users.indexOf(tmpUser) === -1)
-          {
-            persisted_users.push(tmpUser);
-          }
-
-          add_message($who_here_output, tmpUser);
+          persisted_users.push(tmpUser);
         }
 
-        console.log(current_users);
+        add_message($who_here_output, tmpUser);
       }
+
+      console.log(current_users);
     }
   }
 

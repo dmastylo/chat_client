@@ -8,6 +8,7 @@ $(document).ready(function()
   $who_here_output = $('#who-here-output');
   $username_output = $('#username');
   $logout_button = $('#logout');
+  $private_message_template = $($('.privateMessageTemplate').html());
   var server_responses = ["OK", "BROADCAST FROM", "PRIVATE FROM"];
   var commands = ["ME IS", "BROADCAST", "WHO HERE"];
   var message_sent = "";
@@ -26,6 +27,9 @@ $(document).ready(function()
     add_message($main_output, "Please enter your username in the textbox below.");
 
     // Start polling for users
+    // A production server would send the client a message whenver a new user
+    // enters, or one leaves, so that the client would update it in realtime,
+    // instead of polling for it.
     retreive_users();
   }
 
@@ -129,7 +133,10 @@ $(document).ready(function()
   function send_to_server_with_textbox_value()
   {
     var $textarea = $(this).siblings().find('textarea');
+    if ($textarea.val() === "") return;
+
     var message_type = $textarea.data("messagetype");
+    console.log("MESSAGE TYPE IS " + message_type);
     var splitter = "\n";
 
     // The SEND command requires a newline before the actual message
@@ -163,7 +170,6 @@ $(document).ready(function()
       var $this = $(this);
       $this.click(function()
       {
-        console.log("recipient is: " + $this.html());
         add_new_pm_tab($this.html(), false);
       });
     });
@@ -186,7 +192,7 @@ $(document).ready(function()
 
   function replace_all(find, replace, str)
   {
-    return str.replace(new RegExp("^" + find + "$", 'g'), replace);
+    return str.replace(new RegExp("\\b" + find + "\\b", 'g'), replace);
   }
 
   function detect_users_in_text(output)
@@ -217,39 +223,41 @@ $(document).ready(function()
   function add_new_pm_tab(recipient, message)
   {
     // Make sure you can't PM yourself
-    if (recipient != username)
+    if (recipient === username)
     {
-      // Check if conversation already exists
-      if ($('#' + recipient).length)
-      {
-        var PMTab = $('#' + recipient);
-        $('#privateMessageTabs a[href="#' + recipient + '"]').tab('show');
-      }
-      else
-      {
-        // Add a new tab for the private message
-        $("<li><a href='#" + recipient + "' tabindex='-1' data-toggle='tab'>" + recipient + "</a></li>")
-            .appendTo('#privateMessageTabs');
+      return;
+    }
 
-        // Add a new tab-pane for the private message
-        var PMTab = $($('.privateMessageTemplate').html())
-            .attr('id', recipient)
-            .appendTo('.tab-content');
+    // Check if conversation already exists
+    if ($('#' + recipient).length)
+    {
+      var PMTab = $('#' + recipient);
+      $('#privateMessageTabs a[href="#' + recipient + '"]').tab('show');
+    }
+    else
+    {
+      // Add a new tab for the private message
+      $("<li><a href='#" + recipient + "' tabindex='-1' data-toggle='tab'>" + recipient + "</a></li>")
+          .appendTo('#privateMessageTabs');
 
-        PMTab.find(".panel-title").html("Private Message with " + recipient);
-        PMTab.find("textarea").attr("data-messagetype", "SEND " + recipient);
+      // Add a new tab-pane for the private message
+      var PMTab = $private_message_template
+          .attr('id', recipient)
+          .appendTo('.tab-content');
 
-        // Make new private message screen active
-        $('#privateMessageTabs a[href="#' + recipient + '"]').tab('show');
+      PMTab.find(".panel-title").html("Private Message with " + recipient);
+      PMTab.find("textarea").attr("data-messagetype", "SEND " + recipient);
 
-        // Add a click handler for the Send PM button
-        PMTab.find(".sendPMButton").click(send_to_server_with_textbox_value);
-      }
+      // Make new private message screen active
+      $('#privateMessageTabs a[href="#' + recipient + '"]').tab('show');
 
-      if (message)
-      {
-        add_message(PMTab.find(".output"), message);
-      }
+      // Add a click handler for the Send PM button
+      PMTab.find(".sendPMButton").click(send_to_server_with_textbox_value);
+    }
+
+    if (message)
+    {
+      add_message(PMTab.find(".output"), message);
     }
   }
 });

@@ -91,28 +91,36 @@ $(document).ready(function()
     {
       // Assume what we're getting from the server is the list of users
       // currently online
-
-      // Clear out users
-      $who_here_output.html('');
-      current_users.length = 0;
-
       var message = web_socket_message;
 
-      for (var i = 0; i < message.split(",").length; ++i)
+      // Error checking
+      if($.trim(message.split(",")[0]) == "ERROR")
       {
-        var tmpUser = $.trim(message.split(",")[i]);
-        current_users.push(tmpUser);
+        alert("Error! Duplicate username or user is offline!");
+      }
+      else
+      {
 
-        // Add to persisted users if they do not already exist
-        if (persisted_users.indexOf(tmpUser) === -1)
+        // Clear out users
+        $who_here_output.html('');
+        current_users.length = 0;
+
+        for (var i = 0; i < message.split(",").length; ++i)
         {
-          persisted_users.push(tmpUser);
+          var tmpUser = $.trim(message.split(",")[i]);
+          current_users.push(tmpUser);
+
+          // Add to persisted users if they do not already exist
+          if (persisted_users.indexOf(tmpUser) === -1)
+          {
+            persisted_users.push(tmpUser);
+          }
+
+          add_message($who_here_output, tmpUser);
         }
 
-        add_message($who_here_output, tmpUser);
+        console.log(current_users);
       }
-
-      console.log(current_users);
     }
   }
 

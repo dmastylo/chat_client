@@ -1,3 +1,5 @@
+// Damian Mastylo, Chris Celi
+
 $(document).ready(function()
 {
   $message_text_box = $('#inputMessage');

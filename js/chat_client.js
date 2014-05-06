@@ -106,7 +106,6 @@ $(document).ready(function()
       }
       else
       {
-
         // Clear out users
         $who_here_output.html('');
         current_users.length = 0;

@@ -123,7 +123,7 @@ $(document).ready(function()
     var splitter = "\n";
 
     // The SEND command requires a newline before the actual message
-    if (message_type.lastIndexOf("SEND", 0) !== 0 || message_type.lastIndexOf("BROADCAST", 0) !== 0)
+    if (message_type.lastIndexOf("SEND", 0) !== 0 && message_type.lastIndexOf("BROADCAST", 0) !== 0)
     {
       var splitter = " ";
     }

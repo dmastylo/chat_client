@@ -8,6 +8,30 @@
   display: none;
 }
 
+#textareaDiv
+{
+  width:100%;
+}
+
+.form-control
+{
+  width: 100% !important;
+}
+
+#sendButton
+{
+  margin-top: 10px;
+  width: 100%;
+}
+
+#mainOutput
+{
+	max-height: 300px;
+	min-height: 300px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
 .users0
 {
 	color: #FF0000;

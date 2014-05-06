@@ -157,6 +157,8 @@ $(document).ready(function()
         add_new_pm_tab($this.html(), false);
       });
     });
+
+    document.getElementById('mainOutput').scrollTop = 9999999;
   }
 
   function retreive_users()

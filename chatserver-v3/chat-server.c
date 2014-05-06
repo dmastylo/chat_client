@@ -108,7 +108,7 @@
 #define WS_STATUS_CLOSED 4
 
 /* change this to a '|' character for testing the SEND command */
-char newline = '|';
+char newline = '\n';
 
 
 extern int errno;

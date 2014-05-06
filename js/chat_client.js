@@ -6,6 +6,7 @@ $(document).ready(function()
   $send_pm_button = $('#sendPMButton');
   $mainOutput = $('#mainOutput');
   $whoHereOutput = $('#who-here-output');
+  $usernameOutput = $('#username');
   var server_responses = ["OK", "BROADCAST FROM", "PRIVATE FROM"];
   var commands = ["ME IS", "BROADCAST", "WHO HERE"];
   var message_sent = "";
@@ -49,6 +50,8 @@ $(document).ready(function()
       username = message_sent.split(" ")[2].trim();
       var message = "Identified as " + username;
       $message_text_box.data("messagetype", "BROADCAST");
+
+      add_message($usernameOutput, username);
 
       add_message($mainOutput, message);
     }

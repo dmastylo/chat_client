@@ -51,8 +51,10 @@ $(document).ready(function()
       var message = "Identified as " + username;
       $message_text_box.data("messagetype", "BROADCAST");
 
+      // Add the username to the navbar at the top right
       add_message($usernameOutput, username);
 
+      // Add the "Identified as ____" message to the main output
       add_message($mainOutput, message);
     }
     else if (server_response === "BROADCAST FROM")
@@ -173,7 +175,7 @@ $(document).ready(function()
 
   function replace_all(find, replace, str)
   {
-    return str.replace(new RegExp(find, 'g'), replace);
+    return str.replace(new RegExp("^" + find + "$", 'g'), replace);
   }
 
   function detect_users_in_text(output)

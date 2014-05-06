@@ -8,7 +8,7 @@
   display: none;
 }
 
-#textareaDiv
+.form-group
 {
   width:100%;
 }
@@ -18,13 +18,13 @@
   width: 100% !important;
 }
 
-#sendButton
+.btn-send
 {
   margin-top: 10px;
   width: 100%;
 }
 
-#mainOutput
+.outputDiv
 {
 	max-height: 300px;
 	min-height: 300px;

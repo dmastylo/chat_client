@@ -9,7 +9,6 @@ $(document).ready(function()
   $logout_button = $('#logout');
   $private_message_template = $($('.privateMessageTemplate').html());
   var server_responses = ["OK", "BROADCAST FROM", "PRIVATE FROM"];
-  var commands = ["ME IS", "BROADCAST", "WHO HERE"];
   var message_sent = "";
   var username = "";
   var current_users = [];
@@ -30,7 +29,7 @@ $(document).ready(function()
     // enters, or one leaves, so that the client would update it in realtime,
     // instead of polling for it.
     retreive_users();
-  }
+  };
 
   web_socket.onmessage = function(e)
   {
@@ -123,17 +122,17 @@ $(document).ready(function()
 
       console.log(current_users);
     }
-  }
+  };
 
-  web_socket.onclose = function(e)
+  web_socket.onclose = function()
   {
     add_message($main_output, 'Connection closed');
-  }
+  };
 
-  web_socket.onerror = function(e)
+  web_socket.onerror = function()
   {
     add_message($main_output, 'Error from server');
-  }
+  };
 
   $send_button.click(send_to_server_with_textbox_value);
   $refresh_button.click(refresh_user_list);
@@ -146,7 +145,7 @@ $(document).ready(function()
     var message_type = $textarea.data("messagetype");
     console.log("MESSAGE TYPE IS " + message_type);
     var splitter = "\n";
-    var messages = [""]
+    var messages = [""];
 
     // The SEND command requires a newline before the actual message
     if (message_type.lastIndexOf("SEND", 0) !== 0 && message_type.lastIndexOf("BROADCAST", 0) !== 0)
@@ -194,7 +193,7 @@ $(document).ready(function()
     display_area.append("<div class='message'>" + output + "</div>");
 
     // Add click handlers on the usernames that were found in the chat message
-    display_area.find("a").each(function(index, value)
+    display_area.find("a").each(function()
     {
       var $this = $(this);
       $this.click(function()
@@ -251,6 +250,8 @@ $(document).ready(function()
 
   function add_new_pm_tab(recipient, message)
   {
+    var PMTab;
+
     // Make sure you can't PM yourself
     if (recipient === username)
     {
@@ -260,7 +261,7 @@ $(document).ready(function()
     // Check if conversation already exists
     if ($('#' + recipient).length)
     {
-      var PMTab = $('#' + recipient);
+      PMTab = $('#' + recipient);
       $('#privateMessageTabs a[href="#' + recipient + '"]').tab('show');
     }
     else
@@ -270,7 +271,7 @@ $(document).ready(function()
           .appendTo('#privateMessageTabs');
 
       // Add a new tab-pane for the private message
-      var PMTab = $private_message_template
+      PMTab = $private_message_template
           .attr('id', recipient)
           .appendTo('.tab-content');
 

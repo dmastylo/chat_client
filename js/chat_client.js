@@ -201,36 +201,40 @@ $(document).ready(function()
 
   function add_new_pm_tab(recipient, message)
   {
-    // First check if conversation already exists
-    if ($('#' + recipient).length)
+    // Make sure you can't PM yourself
+    if (recipient != username)
     {
-      var PMTab = $('#' + recipient);
-      $('#privateMessageTabs a[href="#' + recipient + '"]').tab('show');
-    }
-    else
-    {
-      // Add a new tab for the private message
-      $("<li><a href='#" + recipient + "' tabindex='-1' data-toggle='tab'>" + recipient + "</a></li>")
-          .appendTo('#privateMessageTabs');
+      // Check if conversation already exists
+      if ($('#' + recipient).length)
+      {
+        var PMTab = $('#' + recipient);
+        $('#privateMessageTabs a[href="#' + recipient + '"]').tab('show');
+      }
+      else
+      {
+        // Add a new tab for the private message
+        $("<li><a href='#" + recipient + "' tabindex='-1' data-toggle='tab'>" + recipient + "</a></li>")
+            .appendTo('#privateMessageTabs');
 
-      // Add a new tab-pane for the private message
-      var PMTab = $($('.privateMessageTemplate').html())
-          .attr('id', recipient)
-          .appendTo('.tab-content');
+        // Add a new tab-pane for the private message
+        var PMTab = $($('.privateMessageTemplate').html())
+            .attr('id', recipient)
+            .appendTo('.tab-content');
 
-      PMTab.find(".panel-title").html("Private Message with " + recipient);
-      PMTab.find("textarea").attr("data-messagetype", "SEND " + recipient);
+        PMTab.find(".panel-title").html("Private Message with " + recipient);
+        PMTab.find("textarea").attr("data-messagetype", "SEND " + recipient);
 
-      // Make new private message screen active
-      $('#privateMessageTabs a[href="#' + recipient + '"]').tab('show');
+        // Make new private message screen active
+        $('#privateMessageTabs a[href="#' + recipient + '"]').tab('show');
 
-      // Add a click handler for the Send PM button
-      PMTab.find(".sendPMButton").click(send_to_server);
-    }
+        // Add a click handler for the Send PM button
+        PMTab.find(".sendPMButton").click(send_to_server);
+      }
 
-    if (message)
-    {
-      add_message(PMTab.find(".output"), message);
+      if (message)
+      {
+        add_message(PMTab.find(".output"), message);
+      }
     }
   }
 });

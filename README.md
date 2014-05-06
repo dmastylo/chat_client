@@ -10,6 +10,8 @@ Goldschmidt Network Programming
 
 Project 4
 
+Tested on Ubuntu 12.04 using Chrome
+
 Homework: Chat client to connect to chat server with websockets
 
 Look in chatserver-v2 and follow compiling directions on chat-server.c. Run the

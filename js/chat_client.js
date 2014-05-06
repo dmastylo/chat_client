@@ -3,7 +3,6 @@ $(document).ready(function()
   $message_text_box = $('#inputMessage');
   $refresh_button = $('#refreshButton');
   $send_button = $('#sendButton');
-  $send_pm_button = $('#sendPMButton');
   $main_output = $('#mainOutput');
   $who_here_output = $('#who-here-output');
   $username_output = $('#username');
@@ -67,6 +66,13 @@ $(document).ready(function()
       {
         web_socket.send("LOGOUT");
         add_message($main_output, "You have logged out.");
+        $('#username').remove();
+        $('#logout').remove();
+        $('.pmMessage').remove();
+        $('.sendPMButton').remove();
+        $message_text_box.remove();
+        $refresh_button.remove();
+        $send_button.remove();
       });
     }
     else if (server_response === "BROADCAST FROM")
@@ -127,7 +133,6 @@ $(document).ready(function()
   }
 
   $send_button.click(send_to_server_with_textbox_value);
-  $send_pm_button.click(send_to_server_with_textbox_value);
   $refresh_button.click(refresh_user_list);
 
   function send_to_server_with_textbox_value()

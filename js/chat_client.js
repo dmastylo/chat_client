@@ -138,6 +138,7 @@ $(document).ready(function()
     var message_type = $textarea.data("messagetype");
     console.log("MESSAGE TYPE IS " + message_type);
     var splitter = "\n";
+    var messages = [""]
 
     // The SEND command requires a newline before the actual message
     if (message_type.lastIndexOf("SEND", 0) !== 0 && message_type.lastIndexOf("BROADCAST", 0) !== 0)
@@ -151,9 +152,29 @@ $(document).ready(function()
       add_message($textarea.parents('.panel').find('.output'), display_message);
     }
 
+    var full_message = $textarea.val();
+    var messages_index = 0;
     message_sent = $textarea.data("messagetype") + splitter + $textarea.val();
-    console.log(message_sent);
-    web_socket.send(message_sent);
+
+    for (var i = 0; i < full_message.length; ++i)
+    {
+      if (messages[messages_index].length < 99)
+      {
+        messages[messages_index] += full_message[i];
+      }
+      else
+      {
+        messages.push(full_message[i]);
+        ++messages_index;
+      }
+    }
+
+    for (var i = 0; i < messages.length; ++i)
+    {
+      var chunked_message = $textarea.data("messagetype") + splitter + messages[i];
+      console.log(chunked_message);
+      web_socket.send(chunked_message);
+    }
 
     // Clear the textarea
     $textarea.val("");
